@@ -1,5 +1,5 @@
 
-(function(l, r) { if (!l || l.getElementById('livereloadscript')) return; r = l.createElement('script'); r.async = 1; r.src = '//' + (self.location.host || 'localhost').split(':')[0] + ':35730/livereload.js?snipver=1'; r.id = 'livereloadscript'; l.getElementsByTagName('head')[0].appendChild(r) })(self.document);
+(function(l, r) { if (!l || l.getElementById('livereloadscript')) return; r = l.createElement('script'); r.async = 1; r.src = '//' + (self.location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1'; r.id = 'livereloadscript'; l.getElementsByTagName('head')[0].appendChild(r) })(self.document);
 var app = (function () {
     'use strict';
 
@@ -352,7 +352,7 @@ var app = (function () {
     	const block = {
     		c: function create() {
     			main = element("main");
-    			add_location(main, file, 231, 0, 7465);
+    			add_location(main, file, 273, 0, 8863);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -387,7 +387,7 @@ var app = (function () {
     	const map = new mapboxgl.Map({
     			container: "map",
     			style: "mapbox://styles/mapbox/navigation-day-v1",
-    			center: [-74.005974, 40.712776],
+    			center: [34.4208, -119.6982],
     			// center: [36.778259, -119.417931] CA
     			zoom: 12,
     			minZoom: 10,
@@ -565,13 +565,67 @@ var app = (function () {
     	// 	let slider_label = "";
     	const marker_container = d3.select(map.getCanvasContainer()).append("svg").attr("width", "100%").attr("height", "100%").style("position", "absolute").style("z-index", 2);
 
+    	let businessesFile = "yelp_academic_dataset_business.json";
+    	let business_data = [];
+    	let business_markers;
+
+    	fetch(businessesFile).then(response => response.text()).then(data => {
+    		// Split the text into an array of lines
+    		const lines = data.trim().split('\n'); // Read response as text
+
+    		// Process each line individually
+    		lines.forEach(line => {
+    			const business = JSON.parse(line); // Parse JSON from each line
+
+    			// Create a marker for each business
+    			const marker = L.circleMarker([business.latitude, business.longitude], {
+    				radius: 5,
+    				fillColor: "#000000", // Black circle
+    				color: "#808080",
+    				weight: 1,
+    				opacity: 0.4,
+    				fillOpacity: 0.4
+    			}).bindPopup(business.name); // Add popup with business name
+
+    			// Add the marker to the business_markers layer group
+    			business_markers.addLayer(marker);
+    		});
+    	}).catch(error => console.error('Error fetching or parsing data:', error));
+
+    	// Initialize Leaflet map
+    	//const map = L.map('map').setView([40, -100], 4);
+    	// Add OpenStreetMap tile layer
+    	L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    		attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    	}).addTo(map);
+
+    	// Create layer group for business markers
+    	business_markers = L.layerGroup().addTo(map);
+
     	const writable_props = [];
 
     	Object.keys($$props).forEach(key => {
     		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console_1.warn(`<App> was created with unknown prop '${key}'`);
     	});
 
-    	$$self.$capture_state = () => ({ map, marker_container });
+    	$$self.$capture_state = () => ({
+    		map,
+    		marker_container,
+    		businessesFile,
+    		business_data,
+    		business_markers
+    	});
+
+    	$$self.$inject_state = $$props => {
+    		if ('businessesFile' in $$props) businessesFile = $$props.businessesFile;
+    		if ('business_data' in $$props) business_data = $$props.business_data;
+    		if ('business_markers' in $$props) business_markers = $$props.business_markers;
+    	};
+
+    	if ($$props && "$$inject" in $$props) {
+    		$$self.$inject_state($$props.$$inject);
+    	}
+
     	return [];
     }
 

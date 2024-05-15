@@ -27,5 +27,11 @@
   },
   "scripts": {
     "deploy": "echo 'Deploying...'"
+  },
+  "homepage": "https://angelinaaaaaaaaaaaa.github.io/Yelp-visualization/",
+  "scripts": {
+    "build": "npm run dev", 
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   }
 }

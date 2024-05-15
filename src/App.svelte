@@ -26,7 +26,7 @@
 
     async function fetchData() {
         try {
-            const response = await fetch("yelp_academic_dataset_business.json");
+            const response = await fetch("/build/yelp_academic_dataset_business.json");
             const data = await response.json();
             allData = data;
             filterMarkers(slider_star, slider_reviews, $searchQuery);
